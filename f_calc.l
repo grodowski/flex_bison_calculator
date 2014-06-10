@@ -8,12 +8,12 @@ int dict_size = 0;
 
 int dict_find(const char* var_name) {
 	int i;
-	for(i = 0; i < dict_size; i++) {
-		if (strcmp(var_name, dict[i]) == 0) return i;
-		dict[dict_size] = (char*)malloc(strlen(var_name) + 1);
-		strncpy(dict[dict_size], var_name, strlen(var_name) + 1);
-		return dict_size++;
-	}
+	for(i = 0; i < dict_size; i++) 
+		if (strcmp(var_name, dict[i]) == 0)
+			return i;
+	dict[dict_size] = (char*)malloc(strlen(var_name) + 1);
+	strncpy(dict[dict_size], var_name, strlen(var_name) + 1);
+	return dict_size++;
 }
 
 %}
@@ -26,7 +26,7 @@ ID			([a-zA-Z]|_)+
 
 {NUM} 		{ yylval.d = atof(yytext); return NUM; }
 {DEF}		{ return DEF; }
-{ID}		{ yylval.index = dict_find(yytext); return ID; } 
+{ID}		{ yylval.i = dict_find(yytext); printf("lexer: %d", yylval.i); printf(" lexem: %s", yytext); return ID; } 
 
 [ ] 		// nothing
 [\n]|. 		{ return yytext[0]; }

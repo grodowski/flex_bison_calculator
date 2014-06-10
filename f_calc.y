@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Data structures */
 typedef enum {cons, var_ident, f_ident, oper, func} nodetype;
@@ -17,14 +17,9 @@ struct expr {
       struct expr *arg2;
     } op; // for oper
 	struct {
-		struct expr *arg1;
-		struct expr *arg2;
-		int n_args; // 0,1,2
-	} funcptr; // for f_ident
-	struct {
 		int var_1; // index of allocated variable 1
 		int var_2; // index of allocated variable 2
-		int n_args; // 0,1,2
+//		int n_args; // 0,1,2
 		struct expr *body;
 	} func; 	
   };
@@ -47,7 +42,7 @@ void define_func_0(int f_index, struct expr *body);
 
 %union {
 	double d;
-	int index;
+	int i;
 	struct expr *e;
 }
 
@@ -57,7 +52,7 @@ void define_func_0(int f_index, struct expr *body);
 
 
 %token <d>		NUM
-%token <index>	ID
+%token <i>		ID
 %token <d>		DEF
 
 %type <d>		expr define define_func // do not return anything
@@ -75,7 +70,8 @@ define		: ID '=' num_expr { set_var($1, compute_expr($3)); } ;
 
 define_func	: DEF ID '(' ID ',' ID ')' num_expr { define_func_2($2, $8, $4, $6); } // two arguments
 			| DEF ID '(' ID ')' num_expr { define_func_1($2, $6, $4); } // one argument
-			| DEF ID '(' ')' num_expr { define_func_0($2, $5); } // no arguments
+			| DEF ID '(' ')' num_expr { define_func_0($2, $5); }
+			; // no arguments
 
 num_expr	: NUM { $$=(struct expr*)malloc(sizeof(struct expr));
 		        	$$->type=cons;
@@ -86,15 +82,18 @@ num_expr	: NUM { $$=(struct expr*)malloc(sizeof(struct expr));
 			        $$->type=var_ident;
 					$$->index=$1;
 				}
-			| ID '(' num_expr ',' num_expr ')' { (struct expr*)malloc(sizeof(struct expr);
+			| ID '(' num_expr ',' num_expr ')' {
+					$$ = (struct expr*)malloc(sizeof(struct expr));
 					$$->type=cons;
 					$$->val=compute_func($1, $3, $5);
 				}
-			| ID '(' num_expr ')' { (struct expr*)malloc(sizeof(struct expr);
+			| ID '(' num_expr ')' { 
+					$$ = (struct expr*)malloc(sizeof(struct expr));
 					$$->type=cons;
 					$$->val=compute_func($1, $3, NULL);
 				}
-			| ID '(' ')' { (struct expr*)malloc(sizeof(struct expr);
+			| ID '(' ')' {
+					$$ = (struct expr*)malloc(sizeof(struct expr));
 					$$->type=cons;
 					$$->val=compute_func($1, NULL, NULL);
 				}
@@ -143,7 +142,8 @@ void define_func_2(int f_index, struct expr *body, int arg1_idx, int arg2_idx) {
 	my_f->func.body = body;
 	my_f->func.var_1 = arg1_idx;
 	my_f->func.var_2 = arg2_idx;
-	my_f->func.n_args = 2;
+	//my_f->func.n_args = 2;
+	printf("defined func: var_1: %d, var_2: %d", my_f->func.var_1, my_f->func.var_2);
 }
 
 void define_func_1(int f_index, struct expr *body, int arg1_idx) {
@@ -152,7 +152,7 @@ void define_func_1(int f_index, struct expr *body, int arg1_idx) {
 	my_f->type = func;
 	my_f->func.body = body;
 	my_f->func.var_1 = arg1_idx;
-	my_f->func.n_args = 1;
+	//my_f->func.n_args = 1;
 }
 
 void define_func_0(int f_index, struct expr *body) {
@@ -160,7 +160,7 @@ void define_func_0(int f_index, struct expr *body) {
 	functions[f_index] = my_f = (struct expr*)malloc(sizeof(struct expr));
 	my_f->type = func;
 	my_f->func.body = body;
-	my_f->func.n_args = 0;
+	//my_f->func.n_args = 0;
 }
 
 double compute_expr(struct expr* expr) {
@@ -184,16 +184,14 @@ double compute_expr(struct expr* expr) {
 			return expr->val;
 		case var_ident:
 	 		return variables[expr->index];
-		case f_ident:
-			// Might be an error ---->
-			return compute_func(functions[expr->index], expr->funcptr.arg1, expr->funcptr.arg2);
 		default: 
 			printf("Not implemented action!");
 	}
 }
 
-// should pass arg1 arg2? can possibly take out of funcptr?
 double compute_func(int funcptr, struct expr *arg1, struct expr *arg2) {
+	printf("Start compute_func\n");
+
 	/* Copy 'stack' */
 	double temp_vars[100];
 	memcpy(temp_vars, variables, sizeof(double)*100);
@@ -204,17 +202,26 @@ double compute_func(int funcptr, struct expr *arg1, struct expr *arg2) {
 	if (arg2 != NULL) b = compute_expr(arg2);
 	struct expr *func = functions[funcptr];
 	
+	printf("a: %f, b: %f\n", a, b);
+
 	/* Store results in the variables array */
-	variables[func.func->var_1] = a;
-	variables[func.func->var_2] = b;
+	variables[func->func.var_1] = a;
+	variables[func->func.var_2] = b;
+
+	printf("current variables[]: ");
+	int i;	
+	for (i = 0; i < 100; i++);
+		printf("%f ", variables[i]);
+	printf("\n"); 
 
 	/* Eval function body (using the variables array) */
-	double result = compute_expr(func.func->body);
+	double result = compute_expr(func->func.body);
 	
 	/* Restore 'stack' */
 	memcpy(variables, temp_vars, sizeof(double)*100);		
 	
 	/* Return result */
+	printf("result: %f\n", result);
 	return result;
 }
 
