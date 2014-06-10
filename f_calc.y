@@ -76,7 +76,6 @@ define_func	: DEF ID '(' ID ',' ID ')' num_expr { define_func_2($2, $8, $4, $6);
 num_expr	: NUM { $$=(struct expr*)malloc(sizeof(struct expr));
 		        	$$->type=cons;
 					$$->val=$1;
-					printf("Reading NUM: %f\n", $1);
 				}
 			| ID  { $$=(struct expr*)malloc(sizeof(struct expr));
 			        $$->type=var_ident;
@@ -195,38 +194,36 @@ double compute_expr(struct expr* expr) {
 }
 
 double compute_func(int funcptr, struct expr *arg1, struct expr *arg2) {
-	printf("Start compute_func\n");
+	struct expr *func = functions[funcptr];
+	
+/*	char error = 0;
+	switch (func->func.n_args) {
+		case 0:
+			if (arg1 || arg2) error = 1;
+		case 1:
+			if (!arg1 || arg2) error = 1;
+		case 2:
+			if (!arg1 || !arg2) error = 1;
+	}
+	if (error) {
+		printf("Wrong number of arguments!");
+		return 0;
+	}
+*/
 
-	/* Copy 'stack' */
 	double temp_vars[100];
 	memcpy(temp_vars, variables, sizeof(double)*100);
 
-	/* Compute arg1 and arg2 as a and b */
 	double a = 0, b = 0;
 	if (arg1 != NULL) a = compute_expr(arg1);
 	if (arg2 != NULL) b = compute_expr(arg2);
-	struct expr *func = functions[funcptr];
 	
-	printf("a: %f, b: %f\n", a, b);
-
-	/* Store results in the variables array */
 	variables[func->func.var_1] = a;
 	variables[func->func.var_2] = b;
 
-	printf("current variables[]: ");
-	int i;	
-	for (i = 0; i < 100; i++);
-		printf("%f ", variables[i]);
-	printf("\n"); 
-
-	/* Eval function body (using the variables array) */
 	double result = compute_expr(func->func.body);
 	
-	/* Restore 'stack' */
-	memcpy(variables, temp_vars, sizeof(double)*100);		
-	
-	/* Return result */
-	printf("result: %f\n", result);
+	memcpy(variables, temp_vars, sizeof(double)*100);			
 	return result;
 }
 

@@ -26,7 +26,7 @@ ID			([a-zA-Z]|_)+
 
 {NUM} 		{ yylval.d = atof(yytext); return NUM; }
 {DEF}		{ return DEF; }
-{ID}		{ yylval.i = dict_find(yytext); printf("lexer: %d", yylval.i); printf(" lexem: %s", yytext); return ID; } 
+{ID}		{ yylval.i = dict_find(yytext); } 
 
 [ ] 		// nothing
 [\n]|. 		{ return yytext[0]; }
