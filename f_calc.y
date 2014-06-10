@@ -9,7 +9,7 @@ typedef enum {cons, var_ident, f_ident, oper, func} nodetype;
 struct expr {
   nodetype type;
   union {
-    double val; // for const
+    double val; // for cons
     int index; // for var_ident and f_ident
     struct {
       char op;
@@ -37,7 +37,7 @@ struct expr* functions[100]; // expr
 double set_var(int idx, double val);
 
 double compute_expr(struct expr* expr);
-double compute_func(struct expr *funcptr, struct expr *arg1, struct expr *arg2);
+double compute_func(int funcptr, struct expr *arg1, struct expr *arg2);
 
 void define_func_2(int f_index, struct expr *body, int arg1_idx, int arg2_idx);
 void define_func_1(int f_index, struct expr *body, int arg1_idx);
@@ -85,6 +85,18 @@ num_expr	: NUM { $$=(struct expr*)malloc(sizeof(struct expr));
 			| ID  { $$=(struct expr*)malloc(sizeof(struct expr));
 			        $$->type=var_ident;
 					$$->index=$1;
+				}
+			| ID '(' num_expr ',' num_expr ')' { (struct expr*)malloc(sizeof(struct expr);
+					$$->type=cons;
+					$$->val=compute_func($1, $3, $5);
+				}
+			| ID '(' num_expr ')' { (struct expr*)malloc(sizeof(struct expr);
+					$$->type=cons;
+					$$->val=compute_func($1, $3, NULL);
+				}
+			| ID '(' ')' { (struct expr*)malloc(sizeof(struct expr);
+					$$->type=cons;
+					$$->val=compute_func($1, NULL, NULL);
 				}
 			| '-' num_expr %prec UNARY_MINUS { $$ = (struct expr*)malloc(sizeof(struct expr));
 					$$->type=oper;
@@ -173,24 +185,37 @@ double compute_expr(struct expr* expr) {
 		case var_ident:
 	 		return variables[expr->index];
 		case f_ident:
+			// Might be an error ---->
 			return compute_func(functions[expr->index], expr->funcptr.arg1, expr->funcptr.arg2);
 		default: 
 			printf("Not implemented action!");
 	}
 }
 
-double compute_func(struct expr *funcptr, struct expr *arg1, struct expr *arg2) {
-	// Copy 'stack'
-	// Compute arg1 and arg2 
-	// Store results in the variables array
-	// Eval function body (using the variables array)
-	// Restore 'stack'
-	// Return result
-	return 10.3;
-}
+// should pass arg1 arg2? can possibly take out of funcptr?
+double compute_func(int funcptr, struct expr *arg1, struct expr *arg2) {
+	/* Copy 'stack' */
+	double temp_vars[100];
+	memcpy(temp_vars, variables, sizeof(double)*100);
 
-double variable_at(int index) {
-	return variables[index];
+	/* Compute arg1 and arg2 as a and b */
+	double a = 0, b = 0;
+	if (arg1 != NULL) a = compute_expr(arg1);
+	if (arg2 != NULL) b = compute_expr(arg2);
+	struct expr *func = functions[funcptr];
+	
+	/* Store results in the variables array */
+	variables[func.func->var_1] = a;
+	variables[func.func->var_2] = b;
+
+	/* Eval function body (using the variables array) */
+	double result = compute_expr(func.func->body);
+	
+	/* Restore 'stack' */
+	memcpy(variables, temp_vars, sizeof(double)*100);		
+	
+	/* Return result */
+	return result;
 }
 
 double set_var(int idx, double val) { 
