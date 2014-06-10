@@ -4,7 +4,7 @@
 #include <string.h>
 
 /* Data structures */
-typedef enum {cons, var_ident, f_ident, oper, func} nodetype;
+typedef enum {cons, var_ident, oper, fptr, func} nodetype;
 
 struct expr {
   nodetype type;
@@ -12,16 +12,16 @@ struct expr {
     double val; // for cons
     int index; // for var_ident and f_ident
     struct {
-      char op;
-      struct expr *arg1;
-      struct expr *arg2;
-    } op; // for oper
+		char op;
+		struct expr *arg1;
+		struct expr *arg2;
+    } op; // for oper / fptr uses operands for arguments
 	struct {
 		int var_1; // index of allocated variable 1
 		int var_2; // index of allocated variable 2
-//		int n_args; // 0,1,2
+		int n_args; // 0,1,2
 		struct expr *body;
-	} func; 	
+	} func; // a function definition (func)	
   };
 };
 
@@ -84,18 +84,21 @@ num_expr	: NUM { $$=(struct expr*)malloc(sizeof(struct expr));
 				}
 			| ID '(' num_expr ',' num_expr ')' {
 					$$ = (struct expr*)malloc(sizeof(struct expr));
-					$$->type=cons;
-					$$->val=compute_func($1, $3, $5);
+					$$->type=fptr;
+					$$->index=$1;
+					$$->op.arg1=$3;
+					$$->op.arg2=$5;
 				}
 			| ID '(' num_expr ')' { 
 					$$ = (struct expr*)malloc(sizeof(struct expr));
-					$$->type=cons;
-					$$->val=compute_func($1, $3, NULL);
+					$$->type=fptr;
+					$$->index=$1;
+					$$->op.arg1=$3;
 				}
 			| ID '(' ')' {
 					$$ = (struct expr*)malloc(sizeof(struct expr));
-					$$->type=cons;
-					$$->val=compute_func($1, NULL, NULL);
+					$$->type=fptr;
+					$$->index=$1;
 				}
 			| '-' num_expr %prec UNARY_MINUS { $$ = (struct expr*)malloc(sizeof(struct expr));
 					$$->type=oper;
@@ -142,7 +145,7 @@ void define_func_2(int f_index, struct expr *body, int arg1_idx, int arg2_idx) {
 	my_f->func.body = body;
 	my_f->func.var_1 = arg1_idx;
 	my_f->func.var_2 = arg2_idx;
-	//my_f->func.n_args = 2;
+	my_f->func.n_args = 2;
 	printf("defined func: var_1: %d, var_2: %d", my_f->func.var_1, my_f->func.var_2);
 }
 
@@ -152,7 +155,7 @@ void define_func_1(int f_index, struct expr *body, int arg1_idx) {
 	my_f->type = func;
 	my_f->func.body = body;
 	my_f->func.var_1 = arg1_idx;
-	//my_f->func.n_args = 1;
+	my_f->func.n_args = 1;
 }
 
 void define_func_0(int f_index, struct expr *body) {
@@ -160,7 +163,7 @@ void define_func_0(int f_index, struct expr *body) {
 	functions[f_index] = my_f = (struct expr*)malloc(sizeof(struct expr));
 	my_f->type = func;
 	my_f->func.body = body;
-	//my_f->func.n_args = 0;
+	my_f->func.n_args = 0;
 }
 
 double compute_expr(struct expr* expr) {
@@ -184,6 +187,8 @@ double compute_expr(struct expr* expr) {
 			return expr->val;
 		case var_ident:
 	 		return variables[expr->index];
+		case fptr:
+			return compute_func(expr->index, expr->op.arg1, expr->op.arg2); 
 		default: 
 			printf("Not implemented action!");
 	}

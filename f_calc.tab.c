@@ -73,7 +73,7 @@
 #include <string.h>
 
 /* Data structures */
-typedef enum {cons, var_ident, f_ident, oper, func} nodetype;
+typedef enum {cons, var_ident, oper, fptr, func} nodetype;
 
 struct expr {
   nodetype type;
@@ -81,16 +81,16 @@ struct expr {
     double val; // for cons
     int index; // for var_ident and f_ident
     struct {
-      char op;
-      struct expr *arg1;
-      struct expr *arg2;
-    } op; // for oper
+		char op;
+		struct expr *arg1;
+		struct expr *arg2;
+    } op; // for oper / fptr uses operands for arguments
 	struct {
 		int var_1; // index of allocated variable 1
 		int var_2; // index of allocated variable 2
-//		int n_args; // 0,1,2
+		int n_args; // 0,1,2
 		struct expr *body;
-	} func; 	
+	} func; // a function definition (func)	
   };
 };
 
@@ -471,8 +471,8 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    63,    63,    64,    65,    66,    67,    69,    71,    72,
-      73,    76,    81,    85,    90,    95,   100,   105,   110,   116,
-     122,   128,   134
+      73,    76,    81,    85,    92,    98,   103,   108,   113,   119,
+     125,   131,   137
 };
 #endif
 
@@ -1508,37 +1508,40 @@ yyreduce:
 #line 85 "f_calc.y"
     {
 					(yyval.e) = (struct expr*)malloc(sizeof(struct expr));
-					(yyval.e)->type=cons;
-					(yyval.e)->val=compute_func((yyvsp[(1) - (6)].i), (yyvsp[(3) - (6)].e), (yyvsp[(5) - (6)].e));
+					(yyval.e)->type=fptr;
+					(yyval.e)->index=(yyvsp[(1) - (6)].i);
+					(yyval.e)->op.arg1=(yyvsp[(3) - (6)].e);
+					(yyval.e)->op.arg2=(yyvsp[(5) - (6)].e);
 				}
     break;
 
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 90 "f_calc.y"
+#line 92 "f_calc.y"
     { 
 					(yyval.e) = (struct expr*)malloc(sizeof(struct expr));
-					(yyval.e)->type=cons;
-					(yyval.e)->val=compute_func((yyvsp[(1) - (4)].i), (yyvsp[(3) - (4)].e), NULL);
+					(yyval.e)->type=fptr;
+					(yyval.e)->index=(yyvsp[(1) - (4)].i);
+					(yyval.e)->op.arg1=(yyvsp[(3) - (4)].e);
 				}
     break;
 
   case 15:
 
 /* Line 1806 of yacc.c  */
-#line 95 "f_calc.y"
+#line 98 "f_calc.y"
     {
 					(yyval.e) = (struct expr*)malloc(sizeof(struct expr));
-					(yyval.e)->type=cons;
-					(yyval.e)->val=compute_func((yyvsp[(1) - (3)].i), NULL, NULL);
+					(yyval.e)->type=fptr;
+					(yyval.e)->index=(yyvsp[(1) - (3)].i);
 				}
     break;
 
   case 16:
 
 /* Line 1806 of yacc.c  */
-#line 100 "f_calc.y"
+#line 103 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
 					(yyval.e)->op.op='-';
@@ -1549,7 +1552,7 @@ yyreduce:
   case 17:
 
 /* Line 1806 of yacc.c  */
-#line 105 "f_calc.y"
+#line 108 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
 					(yyval.e)->op.op='+';
@@ -1560,7 +1563,7 @@ yyreduce:
   case 18:
 
 /* Line 1806 of yacc.c  */
-#line 110 "f_calc.y"
+#line 113 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
 					(yyval.e)->op.op='+';
@@ -1572,7 +1575,7 @@ yyreduce:
   case 19:
 
 /* Line 1806 of yacc.c  */
-#line 116 "f_calc.y"
+#line 119 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
 					(yyval.e)->op.op='-';
@@ -1584,7 +1587,7 @@ yyreduce:
   case 20:
 
 /* Line 1806 of yacc.c  */
-#line 122 "f_calc.y"
+#line 125 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
 					(yyval.e)->op.op='*';
@@ -1596,7 +1599,7 @@ yyreduce:
   case 21:
 
 /* Line 1806 of yacc.c  */
-#line 128 "f_calc.y"
+#line 131 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
 					(yyval.e)->op.op='/';
@@ -1608,14 +1611,14 @@ yyreduce:
   case 22:
 
 /* Line 1806 of yacc.c  */
-#line 134 "f_calc.y"
+#line 137 "f_calc.y"
     { (yyval.e) = (yyvsp[(2) - (3)].e);}
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1619 "f_calc.tab.c"
+#line 1622 "f_calc.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1846,7 +1849,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 136 "f_calc.y"
+#line 139 "f_calc.y"
 
 
 void define_func_2(int f_index, struct expr *body, int arg1_idx, int arg2_idx) {
@@ -1856,7 +1859,7 @@ void define_func_2(int f_index, struct expr *body, int arg1_idx, int arg2_idx) {
 	my_f->func.body = body;
 	my_f->func.var_1 = arg1_idx;
 	my_f->func.var_2 = arg2_idx;
-	//my_f->func.n_args = 2;
+	my_f->func.n_args = 2;
 	printf("defined func: var_1: %d, var_2: %d", my_f->func.var_1, my_f->func.var_2);
 }
 
@@ -1866,7 +1869,7 @@ void define_func_1(int f_index, struct expr *body, int arg1_idx) {
 	my_f->type = func;
 	my_f->func.body = body;
 	my_f->func.var_1 = arg1_idx;
-	//my_f->func.n_args = 1;
+	my_f->func.n_args = 1;
 }
 
 void define_func_0(int f_index, struct expr *body) {
@@ -1874,7 +1877,7 @@ void define_func_0(int f_index, struct expr *body) {
 	functions[f_index] = my_f = (struct expr*)malloc(sizeof(struct expr));
 	my_f->type = func;
 	my_f->func.body = body;
-	//my_f->func.n_args = 0;
+	my_f->func.n_args = 0;
 }
 
 double compute_expr(struct expr* expr) {
@@ -1898,6 +1901,8 @@ double compute_expr(struct expr* expr) {
 			return expr->val;
 		case var_ident:
 	 		return variables[expr->index];
+		case fptr:
+			return compute_func(expr->index, expr->op.arg1, expr->op.arg2); 
 		default: 
 			printf("Not implemented action!");
 	}
