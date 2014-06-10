@@ -69,8 +69,8 @@
 #line 1 "f_calc.y"
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Data structures */
 typedef enum {cons, var_ident, f_ident, oper, func} nodetype;
@@ -78,7 +78,7 @@ typedef enum {cons, var_ident, f_ident, oper, func} nodetype;
 struct expr {
   nodetype type;
   union {
-    double val; // for const
+    double val; // for cons
     int index; // for var_ident and f_ident
     struct {
       char op;
@@ -86,14 +86,9 @@ struct expr {
       struct expr *arg2;
     } op; // for oper
 	struct {
-		struct expr *arg1;
-		struct expr *arg2;
-		int n_args; // 0,1,2
-	} funcptr; // for f_ident
-	struct {
 		int var_1; // index of allocated variable 1
 		int var_2; // index of allocated variable 2
-		int n_args; // 0,1,2
+//		int n_args; // 0,1,2
 		struct expr *body;
 	} func; 	
   };
@@ -106,7 +101,7 @@ struct expr* functions[100]; // expr
 double set_var(int idx, double val);
 
 double compute_expr(struct expr* expr);
-double compute_func(struct expr *funcptr, struct expr *arg1, struct expr *arg2);
+double compute_func(int funcptr, struct expr *arg1, struct expr *arg2);
 
 void define_func_2(int f_index, struct expr *body, int arg1_idx, int arg2_idx);
 void define_func_1(int f_index, struct expr *body, int arg1_idx);
@@ -115,7 +110,7 @@ void define_func_0(int f_index, struct expr *body);
 
 
 /* Line 268 of yacc.c  */
-#line 119 "f_calc.tab.c"
+#line 114 "f_calc.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -157,16 +152,16 @@ typedef union YYSTYPE
 {
 
 /* Line 293 of yacc.c  */
-#line 48 "f_calc.y"
+#line 43 "f_calc.y"
 
 	double d;
-	int index;
+	int i;
 	struct expr *e;
 
 
 
 /* Line 293 of yacc.c  */
-#line 170 "f_calc.tab.c"
+#line 165 "f_calc.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -178,7 +173,7 @@ typedef union YYSTYPE
 
 
 /* Line 343 of yacc.c  */
-#line 182 "f_calc.tab.c"
+#line 177 "f_calc.tab.c"
 
 #ifdef short
 # undef short
@@ -397,16 +392,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  2
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   53
+#define YYLAST   76
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  18
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  5
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  19
+#define YYNRULES  22
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  42
+#define YYNSTATES  49
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
@@ -453,7 +448,8 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,     7,    11,    15,    18,    19,    23,    32,
-      39,    45,    47,    49,    52,    55,    59,    63,    67,    71
+      39,    45,    47,    49,    56,    61,    65,    68,    71,    75,
+      79,    83,    87
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
@@ -463,17 +459,20 @@ static const yytype_int8 yyrhs[] =
       -1,    19,    22,    13,    -1,    19,    13,    -1,    -1,    11,
       14,    22,    -1,    12,    11,    15,    11,    16,    11,    17,
       22,    -1,    12,    11,    15,    11,    17,    22,    -1,    12,
-      11,    15,    17,    22,    -1,    10,    -1,    11,    -1,     4,
-      22,    -1,     3,    22,    -1,    22,     3,    22,    -1,    22,
-       4,    22,    -1,    22,     5,    22,    -1,    22,     6,    22,
-      -1,    15,    22,    17,    -1
+      11,    15,    17,    22,    -1,    10,    -1,    11,    -1,    11,
+      15,    22,    16,    22,    17,    -1,    11,    15,    22,    17,
+      -1,    11,    15,    17,    -1,     4,    22,    -1,     3,    22,
+      -1,    22,     3,    22,    -1,    22,     4,    22,    -1,    22,
+       5,    22,    -1,    22,     6,    22,    -1,    15,    22,    17,
+      -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    68,    68,    69,    70,    71,    72,    74,    76,    77,
-      78,    80,    85,    89,    94,    99,   105,   111,   117,   123
+       0,    63,    63,    64,    65,    66,    67,    69,    71,    72,
+      73,    76,    81,    85,    90,    95,   100,   105,   110,   116,
+     122,   128,   134
 };
 #endif
 
@@ -502,14 +501,16 @@ static const yytype_uint16 yytoknum[] =
 static const yytype_uint8 yyr1[] =
 {
        0,    18,    19,    19,    19,    19,    19,    20,    21,    21,
-      21,    22,    22,    22,    22,    22,    22,    22,    22,    22
+      21,    22,    22,    22,    22,    22,    22,    22,    22,    22,
+      22,    22,    22
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     3,     3,     3,     2,     0,     3,     8,     6,
-       5,     1,     1,     2,     2,     3,     3,     3,     3,     3
+       5,     1,     1,     6,     4,     3,     2,     2,     3,     3,
+       3,     3,     3
 };
 
 /* YYDEFACT[STATE-NAME] -- Default reduction number in state STATE-NUM.
@@ -518,10 +519,10 @@ static const yytype_uint8 yyr2[] =
 static const yytype_uint8 yydefact[] =
 {
        6,     0,     1,     0,     0,    11,    12,     0,     5,     0,
-       0,     0,     0,    12,    14,    13,     0,     0,     0,     2,
-       3,     0,     0,     0,     0,     4,     7,     0,    19,    15,
-      16,    17,    18,     0,     0,     0,     0,    10,     0,     9,
-       0,     8
+       0,     0,     0,    12,    17,    16,     0,     0,     0,     0,
+       2,     3,     0,     0,     0,     0,     4,     7,    15,     0,
+       0,    22,    18,    19,    20,    21,     0,    14,     0,     0,
+       0,     0,     0,    10,    13,     0,     9,     0,     8
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
@@ -532,20 +533,20 @@ static const yytype_int8 yydefgoto[] =
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -11
+#define YYPACT_NINF -10
 static const yytype_int8 yypact[] =
 {
-     -11,    12,   -11,    -1,    -1,   -11,   -10,     6,   -11,    -1,
-      15,    19,    40,   -11,   -11,   -11,    -1,    11,    35,   -11,
-     -11,    -1,    -1,    -1,    -1,   -11,    44,    -6,   -11,     2,
-       2,   -11,   -11,    13,    -1,    23,    -1,    44,    18,    44,
-      -1,    44
+     -10,    37,   -10,    54,    54,   -10,    20,    -6,   -10,    54,
+      -4,    -1,    57,    -8,   -10,   -10,    54,     0,     1,    21,
+     -10,   -10,    54,    54,    54,    54,   -10,    68,   -10,    26,
+      -9,   -10,    40,    40,   -10,   -10,    54,   -10,    59,    54,
+      50,     7,    54,    68,   -10,     6,    68,    54,    68
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -11,   -11,   -11,   -11,    -3
+     -10,   -10,   -10,   -10,    -3
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -554,28 +555,32 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-      14,    15,     3,     4,    16,    33,    18,    23,    24,     5,
-      13,    34,     2,    26,     9,     3,     4,    17,    29,    30,
-      31,    32,     5,     6,     7,     8,    27,     9,    19,    35,
-      36,    37,    20,    39,    38,    40,     0,    41,    21,    22,
-      23,    24,     0,    21,    22,    23,    24,    21,    22,    23,
-      24,     0,    28,    25
+      14,    15,    38,     3,     4,    18,    19,    17,    39,    20,
+       5,    13,    21,    27,    29,     9,    30,    28,    45,    32,
+      33,    34,    35,    47,    22,    23,    24,    25,     0,    22,
+      23,    24,    25,    40,    16,    17,    43,     2,    31,    46,
+       3,     4,    36,    37,    48,    24,    25,     5,     6,     7,
+       8,     0,     9,    22,    23,    24,    25,     3,     4,     0,
+      22,    23,    24,    25,     5,    13,     0,    44,     0,     9,
+      26,    22,    23,    24,    25,    41,    42
 };
 
 #define yypact_value_is_default(yystate) \
-  ((yystate) == (-11))
+  ((yystate) == (-10))
 
 #define yytable_value_is_error(yytable_value) \
   YYID (0)
 
 static const yytype_int8 yycheck[] =
 {
-       3,     4,     3,     4,    14,    11,     9,     5,     6,    10,
-      11,    17,     0,    16,    15,     3,     4,    11,    21,    22,
-      23,    24,    10,    11,    12,    13,    15,    15,    13,    16,
-      17,    34,    13,    36,    11,    17,    -1,    40,     3,     4,
-       5,     6,    -1,     3,     4,     5,     6,     3,     4,     5,
-       6,    -1,    17,    13
+       3,     4,    11,     3,     4,    11,     9,    15,    17,    13,
+      10,    11,    13,    16,    17,    15,    15,    17,    11,    22,
+      23,    24,    25,    17,     3,     4,     5,     6,    -1,     3,
+       4,     5,     6,    36,    14,    15,    39,     0,    17,    42,
+       3,     4,    16,    17,    47,     5,     6,    10,    11,    12,
+      13,    -1,    15,     3,     4,     5,     6,     3,     4,    -1,
+       3,     4,     5,     6,    10,    11,    -1,    17,    -1,    15,
+      13,     3,     4,     5,     6,    16,    17
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -583,10 +588,10 @@ static const yytype_int8 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,    19,     0,     3,     4,    10,    11,    12,    13,    15,
-      20,    21,    22,    11,    22,    22,    14,    11,    22,    13,
-      13,     3,     4,     5,     6,    13,    22,    15,    17,    22,
-      22,    22,    22,    11,    17,    16,    17,    22,    11,    22,
-      17,    22
+      20,    21,    22,    11,    22,    22,    14,    15,    11,    22,
+      13,    13,     3,     4,     5,     6,    13,    22,    17,    22,
+      15,    17,    22,    22,    22,    22,    16,    17,    11,    17,
+      22,    16,    17,    22,    17,    11,    22,    17,    22
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1423,63 +1428,63 @@ yyreduce:
         case 2:
 
 /* Line 1806 of yacc.c  */
-#line 68 "f_calc.y"
+#line 63 "f_calc.y"
     { printf("Variable updated.\n"); }
     break;
 
   case 3:
 
 /* Line 1806 of yacc.c  */
-#line 69 "f_calc.y"
+#line 64 "f_calc.y"
     { printf("Functions updated.\n"); }
     break;
 
   case 4:
 
 /* Line 1806 of yacc.c  */
-#line 70 "f_calc.y"
+#line 65 "f_calc.y"
     { printf("%f\n", compute_expr((yyvsp[(2) - (3)].e))); }
     break;
 
   case 6:
 
 /* Line 1806 of yacc.c  */
-#line 72 "f_calc.y"
+#line 67 "f_calc.y"
     { /* empty */ }
     break;
 
   case 7:
 
 /* Line 1806 of yacc.c  */
-#line 74 "f_calc.y"
-    { set_var((yyvsp[(1) - (3)].index), compute_expr((yyvsp[(3) - (3)].e))); }
+#line 69 "f_calc.y"
+    { set_var((yyvsp[(1) - (3)].i), compute_expr((yyvsp[(3) - (3)].e))); }
     break;
 
   case 8:
 
 /* Line 1806 of yacc.c  */
-#line 76 "f_calc.y"
-    { define_func_2((yyvsp[(2) - (8)].index), (yyvsp[(8) - (8)].e), (yyvsp[(4) - (8)].index), (yyvsp[(6) - (8)].index)); }
+#line 71 "f_calc.y"
+    { define_func_2((yyvsp[(2) - (8)].i), (yyvsp[(8) - (8)].e), (yyvsp[(4) - (8)].i), (yyvsp[(6) - (8)].i)); }
     break;
 
   case 9:
 
 /* Line 1806 of yacc.c  */
-#line 77 "f_calc.y"
-    { define_func_1((yyvsp[(2) - (6)].index), (yyvsp[(6) - (6)].e), (yyvsp[(4) - (6)].index)); }
+#line 72 "f_calc.y"
+    { define_func_1((yyvsp[(2) - (6)].i), (yyvsp[(6) - (6)].e), (yyvsp[(4) - (6)].i)); }
     break;
 
   case 10:
 
 /* Line 1806 of yacc.c  */
-#line 78 "f_calc.y"
-    { define_func_0((yyvsp[(2) - (5)].index), (yyvsp[(5) - (5)].e)); }
+#line 73 "f_calc.y"
+    { define_func_0((yyvsp[(2) - (5)].i), (yyvsp[(5) - (5)].e)); }
     break;
 
   case 11:
 
 /* Line 1806 of yacc.c  */
-#line 80 "f_calc.y"
+#line 76 "f_calc.y"
     { (yyval.e)=(struct expr*)malloc(sizeof(struct expr));
 		        	(yyval.e)->type=cons;
 					(yyval.e)->val=(yyvsp[(1) - (1)].d);
@@ -1490,28 +1495,61 @@ yyreduce:
   case 12:
 
 /* Line 1806 of yacc.c  */
-#line 85 "f_calc.y"
+#line 81 "f_calc.y"
     { (yyval.e)=(struct expr*)malloc(sizeof(struct expr));
 			        (yyval.e)->type=var_ident;
-					(yyval.e)->index=(yyvsp[(1) - (1)].index);
+					(yyval.e)->index=(yyvsp[(1) - (1)].i);
 				}
     break;
 
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 89 "f_calc.y"
-    { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
-					(yyval.e)->type=oper;
-					(yyval.e)->op.op='-';
-					(yyval.e)->op.arg2=(yyvsp[(2) - (2)].e);
+#line 85 "f_calc.y"
+    {
+					(yyval.e) = (struct expr*)malloc(sizeof(struct expr));
+					(yyval.e)->type=cons;
+					(yyval.e)->val=compute_func((yyvsp[(1) - (6)].i), (yyvsp[(3) - (6)].e), (yyvsp[(5) - (6)].e));
 				}
     break;
 
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 94 "f_calc.y"
+#line 90 "f_calc.y"
+    { 
+					(yyval.e) = (struct expr*)malloc(sizeof(struct expr));
+					(yyval.e)->type=cons;
+					(yyval.e)->val=compute_func((yyvsp[(1) - (4)].i), (yyvsp[(3) - (4)].e), NULL);
+				}
+    break;
+
+  case 15:
+
+/* Line 1806 of yacc.c  */
+#line 95 "f_calc.y"
+    {
+					(yyval.e) = (struct expr*)malloc(sizeof(struct expr));
+					(yyval.e)->type=cons;
+					(yyval.e)->val=compute_func((yyvsp[(1) - (3)].i), NULL, NULL);
+				}
+    break;
+
+  case 16:
+
+/* Line 1806 of yacc.c  */
+#line 100 "f_calc.y"
+    { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
+					(yyval.e)->type=oper;
+					(yyval.e)->op.op='-';
+					(yyval.e)->op.arg2=(yyvsp[(2) - (2)].e);
+				}
+    break;
+
+  case 17:
+
+/* Line 1806 of yacc.c  */
+#line 105 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
 					(yyval.e)->op.op='+';
@@ -1519,49 +1557,13 @@ yyreduce:
 				}
     break;
 
-  case 15:
-
-/* Line 1806 of yacc.c  */
-#line 99 "f_calc.y"
-    { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
-					(yyval.e)->type=oper;
-					(yyval.e)->op.op='+';
-					(yyval.e)->op.arg1=(yyvsp[(1) - (3)].e);
-					(yyval.e)->op.arg2=(yyvsp[(3) - (3)].e);
-				}
-    break;
-
-  case 16:
-
-/* Line 1806 of yacc.c  */
-#line 105 "f_calc.y"
-    { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
-					(yyval.e)->type=oper;
-					(yyval.e)->op.op='-';
-					(yyval.e)->op.arg1=(yyvsp[(1) - (3)].e);
-					(yyval.e)->op.arg2=(yyvsp[(3) - (3)].e);
-				}
-    break;
-
-  case 17:
-
-/* Line 1806 of yacc.c  */
-#line 111 "f_calc.y"
-    { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
-					(yyval.e)->type=oper;
-					(yyval.e)->op.op='*';
-					(yyval.e)->op.arg1=(yyvsp[(1) - (3)].e);
-					(yyval.e)->op.arg2=(yyvsp[(3) - (3)].e);
-				}
-    break;
-
   case 18:
 
 /* Line 1806 of yacc.c  */
-#line 117 "f_calc.y"
+#line 110 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
-					(yyval.e)->op.op='/';
+					(yyval.e)->op.op='+';
 					(yyval.e)->op.arg1=(yyvsp[(1) - (3)].e);
 					(yyval.e)->op.arg2=(yyvsp[(3) - (3)].e);
 				}
@@ -1570,14 +1572,50 @@ yyreduce:
   case 19:
 
 /* Line 1806 of yacc.c  */
-#line 123 "f_calc.y"
+#line 116 "f_calc.y"
+    { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
+					(yyval.e)->type=oper;
+					(yyval.e)->op.op='-';
+					(yyval.e)->op.arg1=(yyvsp[(1) - (3)].e);
+					(yyval.e)->op.arg2=(yyvsp[(3) - (3)].e);
+				}
+    break;
+
+  case 20:
+
+/* Line 1806 of yacc.c  */
+#line 122 "f_calc.y"
+    { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
+					(yyval.e)->type=oper;
+					(yyval.e)->op.op='*';
+					(yyval.e)->op.arg1=(yyvsp[(1) - (3)].e);
+					(yyval.e)->op.arg2=(yyvsp[(3) - (3)].e);
+				}
+    break;
+
+  case 21:
+
+/* Line 1806 of yacc.c  */
+#line 128 "f_calc.y"
+    { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
+					(yyval.e)->type=oper;
+					(yyval.e)->op.op='/';
+					(yyval.e)->op.arg1=(yyvsp[(1) - (3)].e);
+					(yyval.e)->op.arg2=(yyvsp[(3) - (3)].e);
+				}
+    break;
+
+  case 22:
+
+/* Line 1806 of yacc.c  */
+#line 134 "f_calc.y"
     { (yyval.e) = (yyvsp[(2) - (3)].e);}
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1581 "f_calc.tab.c"
+#line 1619 "f_calc.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1808,7 +1846,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 125 "f_calc.y"
+#line 136 "f_calc.y"
 
 
 void define_func_2(int f_index, struct expr *body, int arg1_idx, int arg2_idx) {
@@ -1818,7 +1856,8 @@ void define_func_2(int f_index, struct expr *body, int arg1_idx, int arg2_idx) {
 	my_f->func.body = body;
 	my_f->func.var_1 = arg1_idx;
 	my_f->func.var_2 = arg2_idx;
-	my_f->func.n_args = 2;
+	//my_f->func.n_args = 2;
+	printf("defined func: var_1: %d, var_2: %d", my_f->func.var_1, my_f->func.var_2);
 }
 
 void define_func_1(int f_index, struct expr *body, int arg1_idx) {
@@ -1827,7 +1866,7 @@ void define_func_1(int f_index, struct expr *body, int arg1_idx) {
 	my_f->type = func;
 	my_f->func.body = body;
 	my_f->func.var_1 = arg1_idx;
-	my_f->func.n_args = 1;
+	//my_f->func.n_args = 1;
 }
 
 void define_func_0(int f_index, struct expr *body) {
@@ -1835,7 +1874,7 @@ void define_func_0(int f_index, struct expr *body) {
 	functions[f_index] = my_f = (struct expr*)malloc(sizeof(struct expr));
 	my_f->type = func;
 	my_f->func.body = body;
-	my_f->func.n_args = 0;
+	//my_f->func.n_args = 0;
 }
 
 double compute_expr(struct expr* expr) {
@@ -1859,25 +1898,45 @@ double compute_expr(struct expr* expr) {
 			return expr->val;
 		case var_ident:
 	 		return variables[expr->index];
-		case f_ident:
-			return compute_func(functions[expr->index], expr->funcptr.arg1, expr->funcptr.arg2);
 		default: 
 			printf("Not implemented action!");
 	}
 }
 
-double compute_func(struct expr *funcptr, struct expr *arg1, struct expr *arg2) {
-	// Copy 'stack'
-	// Compute arg1 and arg2 
-	// Store results in the variables array
-	// Eval function body (using the variables array)
-	// Restore 'stack'
-	// Return result
-	return 10.3;
-}
+double compute_func(int funcptr, struct expr *arg1, struct expr *arg2) {
+	printf("Start compute_func\n");
 
-double variable_at(int index) {
-	return variables[index];
+	/* Copy 'stack' */
+	double temp_vars[100];
+	memcpy(temp_vars, variables, sizeof(double)*100);
+
+	/* Compute arg1 and arg2 as a and b */
+	double a = 0, b = 0;
+	if (arg1 != NULL) a = compute_expr(arg1);
+	if (arg2 != NULL) b = compute_expr(arg2);
+	struct expr *func = functions[funcptr];
+	
+	printf("a: %f, b: %f\n", a, b);
+
+	/* Store results in the variables array */
+	variables[func->func.var_1] = a;
+	variables[func->func.var_2] = b;
+
+	printf("current variables[]: ");
+	int i;	
+	for (i = 0; i < 100; i++);
+		printf("%f ", variables[i]);
+	printf("\n"); 
+
+	/* Eval function body (using the variables array) */
+	double result = compute_expr(func->func.body);
+	
+	/* Restore 'stack' */
+	memcpy(variables, temp_vars, sizeof(double)*100);		
+	
+	/* Return result */
+	printf("result: %f\n", result);
+	return result;
 }
 
 double set_var(int idx, double val) { 

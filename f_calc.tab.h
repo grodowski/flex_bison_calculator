@@ -52,10 +52,10 @@ typedef union YYSTYPE
 {
 
 /* Line 2068 of yacc.c  */
-#line 48 "f_calc.y"
+#line 43 "f_calc.y"
 
 	double d;
-	int index;
+	int i;
 	struct expr *e;
 
 

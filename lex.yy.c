@@ -474,12 +474,12 @@ int dict_size = 0;
 
 int dict_find(const char* var_name) {
 	int i;
-	for(i = 0; i < dict_size; i++) {
-		if (strcmp(var_name, dict[i]) == 0) return i;
-		dict[dict_size] = (char*)malloc(strlen(var_name) + 1);
-		strncpy(dict[dict_size], var_name, strlen(var_name) + 1);
-		return dict_size++;
-	}
+	for(i = 0; i < dict_size; i++) 
+		if (strcmp(var_name, dict[i]) == 0)
+			return i;
+	dict[dict_size] = (char*)malloc(strlen(var_name) + 1);
+	strncpy(dict[dict_size], var_name, strlen(var_name) + 1);
+	return dict_size++;
 }
 
 #line 486 "lex.yy.c"
@@ -768,7 +768,7 @@ YY_RULE_SETUP
 case 3:
 YY_RULE_SETUP
 #line 29 "f_calc.l"
-{ yylval.index = dict_find(yytext); return ID; } 
+{ yylval.i = dict_find(yytext); printf("lexer: %d", yylval.i); printf(" lexem: %s", yytext); return ID; } 
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
