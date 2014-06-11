@@ -70,8 +70,8 @@ define		: ID '=' num_expr { set_var($1, compute_expr($3)); } ;
 
 define_func	: DEF ID '(' ID ',' ID ')' num_expr { define_func_2($2, $8, $4, $6); } // two arguments
 			| DEF ID '(' ID ')' num_expr { define_func_1($2, $6, $4); } // one argument
-			| DEF ID '(' ')' num_expr { define_func_0($2, $5); }
-			; // no arguments
+			| DEF ID '(' ')' num_expr { define_func_0($2, $5); } // no arguments
+			; 
 
 num_expr	: NUM { $$=(struct expr*)malloc(sizeof(struct expr));
 		        	$$->type=cons;
@@ -110,6 +110,7 @@ num_expr	: NUM { $$=(struct expr*)malloc(sizeof(struct expr));
 					$$->op.arg2=$2;
 				}
 			| num_expr '+' num_expr { $$ = (struct expr*)malloc(sizeof(struct expr));
+					printf("Creating addition node...");
 					$$->type=oper;
 					$$->op.op='+';
 					$$->op.arg1=$1;
@@ -218,8 +219,10 @@ double compute_func(int funcptr, struct expr *arg1, struct expr *arg2) {
 	if (arg1 != NULL) a = compute_expr(arg1);
 	if (arg2 != NULL) b = compute_expr(arg2);
 	
-	variables[func->func.var_1] = a;
-	variables[func->func.var_2] = b;
+	if (func->func.n_args == 1 || func->func.n_args == 2) 
+		variables[func->func.var_1] = a;
+	if (func->func.n_args == 2) 
+		variables[func->func.var_2] = b;
 
 	double result = compute_expr(func->func.body);
 	
