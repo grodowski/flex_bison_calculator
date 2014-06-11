@@ -110,7 +110,6 @@ num_expr	: NUM { $$=(struct expr*)malloc(sizeof(struct expr));
 					$$->op.arg2=$2;
 				}
 			| num_expr '+' num_expr { $$ = (struct expr*)malloc(sizeof(struct expr));
-					printf("Creating addition node...");
 					$$->type=oper;
 					$$->op.op='+';
 					$$->op.arg1=$1;
@@ -146,7 +145,6 @@ void define_func_2(int f_index, struct expr *body, int arg1_idx, int arg2_idx) {
 	my_f->func.var_1 = arg1_idx;
 	my_f->func.var_2 = arg2_idx;
 	my_f->func.n_args = 2;
-	printf("defined func: var_1: %d, var_2: %d", my_f->func.var_1, my_f->func.var_2);
 }
 
 void define_func_1(int f_index, struct expr *body, int arg1_idx) {
@@ -197,20 +195,22 @@ double compute_expr(struct expr* expr) {
 double compute_func(int funcptr, struct expr *arg1, struct expr *arg2) {
 	struct expr *func = functions[funcptr];
 	
-/*	char error = 0;
+	char error = 0;
 	switch (func->func.n_args) {
 		case 0:
 			if (arg1 || arg2) error = 1;
+			break;
 		case 1:
 			if (!arg1 || arg2) error = 1;
+			break;
 		case 2:
 			if (!arg1 || !arg2) error = 1;
+			break;
 	}
 	if (error) {
-		printf("Wrong number of arguments!");
+		printf("Error! Wrong number of arguments!\n");
 		return 0;
 	}
-*/
 
 	double temp_vars[100];
 	memcpy(temp_vars, variables, sizeof(double)*100);
