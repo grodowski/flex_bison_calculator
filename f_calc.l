@@ -27,7 +27,14 @@ ID			([a-zA-Z]|_)+
 {NUM} 		{ yylval.d = atof(yytext); return NUM; }
 {DEF}		{ return DEF; }
 {ID}		{ yylval.i = dict_find(yytext); return ID; } 
-
+"=="		{ return EQL; }
+"<"		{ return LT; }
+">"		{ return GT; }
+"<="		{ return LTE; }
+">="		{ return GTE; }
+"&&"		{ return AND; }
+"||"		{ return OR; }
+"!"		{ return NOT; }
 [ ] 		// nothing
 [\n]|. 		{ return yytext[0]; }
 

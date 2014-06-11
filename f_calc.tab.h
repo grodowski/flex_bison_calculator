@@ -37,11 +37,20 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     UNARY_PLUS = 258,
-     UNARY_MINUS = 259,
-     NUM = 260,
-     ID = 261,
-     DEF = 262
+     GT = 258,
+     LT = 259,
+     GTE = 260,
+     LTE = 261,
+     EQL = 262,
+     OR = 263,
+     AND = 264,
+     COND = 265,
+     UNARY_PLUS = 266,
+     UNARY_MINUS = 267,
+     NOT = 268,
+     NUM = 269,
+     ID = 270,
+     DEF = 271
    };
 #endif
 
@@ -52,7 +61,7 @@ typedef union YYSTYPE
 {
 
 /* Line 2068 of yacc.c  */
-#line 43 "f_calc.y"
+#line 47 "f_calc.y"
 
 	double d;
 	int i;
@@ -61,7 +70,7 @@ typedef union YYSTYPE
 
 
 /* Line 2068 of yacc.c  */
-#line 65 "f_calc.tab.h"
+#line 74 "f_calc.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
