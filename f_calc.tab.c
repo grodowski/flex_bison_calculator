@@ -471,8 +471,8 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    63,    63,    64,    65,    66,    67,    69,    71,    72,
-      73,    76,    81,    85,    92,    98,   103,   108,   113,   119,
-     125,   131,   137
+      73,    76,    80,    84,    91,    97,   102,   107,   112,   118,
+     124,   130,   136
 };
 #endif
 
@@ -1488,14 +1488,13 @@ yyreduce:
     { (yyval.e)=(struct expr*)malloc(sizeof(struct expr));
 		        	(yyval.e)->type=cons;
 					(yyval.e)->val=(yyvsp[(1) - (1)].d);
-					printf("Reading NUM: %f\n", (yyvsp[(1) - (1)].d));
 				}
     break;
 
   case 12:
 
 /* Line 1806 of yacc.c  */
-#line 81 "f_calc.y"
+#line 80 "f_calc.y"
     { (yyval.e)=(struct expr*)malloc(sizeof(struct expr));
 			        (yyval.e)->type=var_ident;
 					(yyval.e)->index=(yyvsp[(1) - (1)].i);
@@ -1505,7 +1504,7 @@ yyreduce:
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 85 "f_calc.y"
+#line 84 "f_calc.y"
     {
 					(yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=fptr;
@@ -1518,7 +1517,7 @@ yyreduce:
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 92 "f_calc.y"
+#line 91 "f_calc.y"
     { 
 					(yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=fptr;
@@ -1530,7 +1529,7 @@ yyreduce:
   case 15:
 
 /* Line 1806 of yacc.c  */
-#line 98 "f_calc.y"
+#line 97 "f_calc.y"
     {
 					(yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=fptr;
@@ -1541,7 +1540,7 @@ yyreduce:
   case 16:
 
 /* Line 1806 of yacc.c  */
-#line 103 "f_calc.y"
+#line 102 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
 					(yyval.e)->op.op='-';
@@ -1552,7 +1551,7 @@ yyreduce:
   case 17:
 
 /* Line 1806 of yacc.c  */
-#line 108 "f_calc.y"
+#line 107 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
 					(yyval.e)->op.op='+';
@@ -1563,7 +1562,7 @@ yyreduce:
   case 18:
 
 /* Line 1806 of yacc.c  */
-#line 113 "f_calc.y"
+#line 112 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
 					(yyval.e)->op.op='+';
@@ -1575,7 +1574,7 @@ yyreduce:
   case 19:
 
 /* Line 1806 of yacc.c  */
-#line 119 "f_calc.y"
+#line 118 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
 					(yyval.e)->op.op='-';
@@ -1587,7 +1586,7 @@ yyreduce:
   case 20:
 
 /* Line 1806 of yacc.c  */
-#line 125 "f_calc.y"
+#line 124 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
 					(yyval.e)->op.op='*';
@@ -1599,7 +1598,7 @@ yyreduce:
   case 21:
 
 /* Line 1806 of yacc.c  */
-#line 131 "f_calc.y"
+#line 130 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=oper;
 					(yyval.e)->op.op='/';
@@ -1611,14 +1610,14 @@ yyreduce:
   case 22:
 
 /* Line 1806 of yacc.c  */
-#line 137 "f_calc.y"
+#line 136 "f_calc.y"
     { (yyval.e) = (yyvsp[(2) - (3)].e);}
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1622 "f_calc.tab.c"
+#line 1621 "f_calc.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1849,7 +1848,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 139 "f_calc.y"
+#line 138 "f_calc.y"
 
 
 void define_func_2(int f_index, struct expr *body, int arg1_idx, int arg2_idx) {
@@ -1860,7 +1859,6 @@ void define_func_2(int f_index, struct expr *body, int arg1_idx, int arg2_idx) {
 	my_f->func.var_1 = arg1_idx;
 	my_f->func.var_2 = arg2_idx;
 	my_f->func.n_args = 2;
-	printf("defined func: var_1: %d, var_2: %d", my_f->func.var_1, my_f->func.var_2);
 }
 
 void define_func_1(int f_index, struct expr *body, int arg1_idx) {
@@ -1911,20 +1909,22 @@ double compute_expr(struct expr* expr) {
 double compute_func(int funcptr, struct expr *arg1, struct expr *arg2) {
 	struct expr *func = functions[funcptr];
 	
-/*	char error = 0;
+	char error = 0;
 	switch (func->func.n_args) {
 		case 0:
 			if (arg1 || arg2) error = 1;
+			break;
 		case 1:
 			if (!arg1 || arg2) error = 1;
+			break;
 		case 2:
 			if (!arg1 || !arg2) error = 1;
+			break;
 	}
 	if (error) {
-		printf("Wrong number of arguments!");
+		printf("Error! Wrong number of arguments!\n");
 		return 0;
 	}
-*/
 
 	double temp_vars[100];
 	memcpy(temp_vars, variables, sizeof(double)*100);
@@ -1933,8 +1933,10 @@ double compute_func(int funcptr, struct expr *arg1, struct expr *arg2) {
 	if (arg1 != NULL) a = compute_expr(arg1);
 	if (arg2 != NULL) b = compute_expr(arg2);
 	
-	variables[func->func.var_1] = a;
-	variables[func->func.var_2] = b;
+	if (func->func.n_args == 1 || func->func.n_args == 2) 
+		variables[func->func.var_1] = a;
+	if (func->func.n_args == 2) 
+		variables[func->func.var_2] = b;
 
 	double result = compute_expr(func->func.body);
 	

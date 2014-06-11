@@ -768,7 +768,7 @@ YY_RULE_SETUP
 case 3:
 YY_RULE_SETUP
 #line 29 "f_calc.l"
-{ yylval.i = dict_find(yytext); printf("lexer: %d", yylval.i); printf(" lexem: %s", yytext); return ID; } 
+{ yylval.i = dict_find(yytext); return ID; } 
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
