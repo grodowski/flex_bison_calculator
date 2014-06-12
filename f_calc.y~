@@ -81,8 +81,6 @@ define_func	: DEF ID '(' ID ',' ID ')' cond { define_func_2($2, $8, $4, $6); } /
 
 cond		: num_expr '?' cond ':' cond { $$ = (struct expr*)malloc(sizeof(struct expr));
 				$$->type=cond;
-				printf("t: %d\n", compute_expr($3));
-				printf("f: %d\n", compute_expr($5));
 				$$->cond.c_expr = $1;
 				$$->cond.t_expr = $3;
 				$$->cond.f_expr = $5; 
@@ -173,7 +171,6 @@ double compute_expr(struct expr* expr) {
 	double a = 0, b = 0;	
 	switch (expr->type) {
 		case cond:
-			printf("Calculating conditional");
 			if (compute_expr(expr->cond.c_expr))
 				return compute_expr(expr->cond.t_expr);
 			else
@@ -242,7 +239,7 @@ double compute_func(int funcptr, struct expr *arg1, struct expr *arg2) {
 		variables[func->func.var_1] = a;
 	if (func->func.n_args == 2) 
 		variables[func->func.var_2] = b;
-
+	printf("@\n");
 	double result = compute_expr(func->func.body);
 	
 	memcpy(variables, temp_vars, sizeof(double)*100);			

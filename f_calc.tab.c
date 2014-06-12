@@ -488,9 +488,9 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    69,    69,    70,    71,    72,    73,    75,    77,    78,
-      79,    82,    90,    92,    96,   100,   107,   113,   118,   119,
-     120,   121,   122,   123,   124,   125,   126,   127,   128,   129,
-     130,   131,   132
+      79,    82,    88,    90,    94,    98,   105,   111,   116,   117,
+     118,   119,   120,   121,   122,   123,   124,   125,   126,   127,
+     128,   129,   130
 };
 #endif
 
@@ -1531,8 +1531,6 @@ yyreduce:
 #line 82 "f_calc.y"
     { (yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 				(yyval.e)->type=cond;
-				printf("t: %f\n", compute_expr((yyvsp[(3) - (5)].e)));
-				printf("f: %f\n", compute_expr((yyvsp[(5) - (5)].e)));
 				(yyval.e)->cond.c_expr = (yyvsp[(1) - (5)].e);
 				(yyval.e)->cond.t_expr = (yyvsp[(3) - (5)].e);
 				(yyval.e)->cond.f_expr = (yyvsp[(5) - (5)].e); 
@@ -1542,14 +1540,14 @@ yyreduce:
   case 12:
 
 /* Line 1806 of yacc.c  */
-#line 90 "f_calc.y"
+#line 88 "f_calc.y"
     { (yyval.e) = (yyvsp[(1) - (1)].e); }
     break;
 
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 92 "f_calc.y"
+#line 90 "f_calc.y"
     { (yyval.e)=(struct expr*)malloc(sizeof(struct expr));
 		        	(yyval.e)->type=cons;
 					(yyval.e)->val=(yyvsp[(1) - (1)].d);
@@ -1559,7 +1557,7 @@ yyreduce:
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 96 "f_calc.y"
+#line 94 "f_calc.y"
     { (yyval.e)=(struct expr*)malloc(sizeof(struct expr));
 			        (yyval.e)->type=var_ident;
 					(yyval.e)->index=(yyvsp[(1) - (1)].i);
@@ -1569,7 +1567,7 @@ yyreduce:
   case 15:
 
 /* Line 1806 of yacc.c  */
-#line 100 "f_calc.y"
+#line 98 "f_calc.y"
     {
 					(yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=fptr;
@@ -1582,7 +1580,7 @@ yyreduce:
   case 16:
 
 /* Line 1806 of yacc.c  */
-#line 107 "f_calc.y"
+#line 105 "f_calc.y"
     { 
 					(yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=fptr;
@@ -1594,7 +1592,7 @@ yyreduce:
   case 17:
 
 /* Line 1806 of yacc.c  */
-#line 113 "f_calc.y"
+#line 111 "f_calc.y"
     {
 					(yyval.e) = (struct expr*)malloc(sizeof(struct expr));
 					(yyval.e)->type=fptr;
@@ -1605,112 +1603,112 @@ yyreduce:
   case 18:
 
 /* Line 1806 of yacc.c  */
-#line 118 "f_calc.y"
+#line 116 "f_calc.y"
     { (yyval.e) = define_operator_expr('-', 0, (yyvsp[(2) - (2)].e)); }
     break;
 
   case 19:
 
 /* Line 1806 of yacc.c  */
-#line 119 "f_calc.y"
+#line 117 "f_calc.y"
     { (yyval.e) = define_operator_expr('+', 0, (yyvsp[(2) - (2)].e)); }
     break;
 
   case 20:
 
 /* Line 1806 of yacc.c  */
-#line 120 "f_calc.y"
+#line 118 "f_calc.y"
     { (yyval.e) = define_operator_expr('+', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
     break;
 
   case 21:
 
 /* Line 1806 of yacc.c  */
-#line 121 "f_calc.y"
-    { (yyval.e) = define_operator_expr('-', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
+#line 119 "f_calc.y"
+    { printf("minus"); (yyval.e) = define_operator_expr('-', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
     break;
 
   case 22:
 
 /* Line 1806 of yacc.c  */
-#line 122 "f_calc.y"
+#line 120 "f_calc.y"
     { (yyval.e) = define_operator_expr('*', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
     break;
 
   case 23:
 
 /* Line 1806 of yacc.c  */
-#line 123 "f_calc.y"
+#line 121 "f_calc.y"
     { (yyval.e) = define_operator_expr('/', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
     break;
 
   case 24:
 
 /* Line 1806 of yacc.c  */
-#line 124 "f_calc.y"
+#line 122 "f_calc.y"
     { (yyval.e) = define_operator_expr('<', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
     break;
 
   case 25:
 
 /* Line 1806 of yacc.c  */
-#line 125 "f_calc.y"
+#line 123 "f_calc.y"
     { (yyval.e) = define_operator_expr('>', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
     break;
 
   case 26:
 
 /* Line 1806 of yacc.c  */
-#line 126 "f_calc.y"
+#line 124 "f_calc.y"
     { (yyval.e) = define_operator_expr('e', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
     break;
 
   case 27:
 
 /* Line 1806 of yacc.c  */
-#line 127 "f_calc.y"
+#line 125 "f_calc.y"
     { (yyval.e) = define_operator_expr('l', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
     break;
 
   case 28:
 
 /* Line 1806 of yacc.c  */
-#line 128 "f_calc.y"
+#line 126 "f_calc.y"
     { (yyval.e) = define_operator_expr('g', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
     break;
 
   case 29:
 
 /* Line 1806 of yacc.c  */
-#line 129 "f_calc.y"
+#line 127 "f_calc.y"
     { (yyval.e) = define_operator_expr('a', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
     break;
 
   case 30:
 
 /* Line 1806 of yacc.c  */
-#line 130 "f_calc.y"
+#line 128 "f_calc.y"
     { (yyval.e) = define_operator_expr('o', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
     break;
 
   case 31:
 
 /* Line 1806 of yacc.c  */
-#line 131 "f_calc.y"
+#line 129 "f_calc.y"
     { (yyval.e) = define_operator_expr('n', 0, (yyvsp[(2) - (2)].e)); }
     break;
 
   case 32:
 
 /* Line 1806 of yacc.c  */
-#line 132 "f_calc.y"
+#line 130 "f_calc.y"
     { (yyval.e) = (yyvsp[(2) - (3)].e);}
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1714 "f_calc.tab.c"
+#line 1712 "f_calc.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1941,7 +1939,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 134 "f_calc.y"
+#line 132 "f_calc.y"
 
 
 void define_func_2(int f_index, struct expr *body, int arg1_idx, int arg2_idx) {
@@ -1984,7 +1982,6 @@ double compute_expr(struct expr* expr) {
 	double a = 0, b = 0;	
 	switch (expr->type) {
 		case cond:
-			printf("Calculating conditional");
 			if (compute_expr(expr->cond.c_expr))
 				return compute_expr(expr->cond.t_expr);
 			else
@@ -2053,7 +2050,7 @@ double compute_func(int funcptr, struct expr *arg1, struct expr *arg2) {
 		variables[func->func.var_1] = a;
 	if (func->func.n_args == 2) 
 		variables[func->func.var_2] = b;
-
+	printf("@\n");
 	double result = compute_expr(func->func.body);
 	
 	memcpy(variables, temp_vars, sizeof(double)*100);			
