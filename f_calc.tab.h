@@ -44,13 +44,12 @@
      EQL = 262,
      OR = 263,
      AND = 264,
-     COND = 265,
-     UNARY_PLUS = 266,
-     UNARY_MINUS = 267,
-     NOT = 268,
-     NUM = 269,
-     ID = 270,
-     DEF = 271
+     UNARY_PLUS = 265,
+     UNARY_MINUS = 266,
+     NOT = 267,
+     NUM = 268,
+     ID = 269,
+     DEF = 270
    };
 #endif
 
@@ -70,7 +69,7 @@ typedef union YYSTYPE
 
 
 /* Line 2068 of yacc.c  */
-#line 74 "f_calc.tab.h"
+#line 73 "f_calc.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -54,7 +54,6 @@ void define_func_0(int f_index, struct expr *body);
 %left '*' '/' '%'
 %left EQL LTE GTE LT GT
 %left AND OR
-%left COND
 %left NOT UNARY_MINUS UNARY_PLUS
 
 
@@ -63,22 +62,32 @@ void define_func_0(int f_index, struct expr *body);
 %token <d>		DEF
 
 %type <d>		expr define define_func // do not return anything
-%type <e>		num_expr
+%type <e>		cond num_expr
 
 %%
 
 expr	 	: expr define '\n' { printf("Variable updated.\n"); }
 			| expr define_func '\n' { printf("Functions updated.\n"); }
-			| expr num_expr '\n' { printf("%f\n", compute_expr($2)); }
+			| expr cond '\n' { printf("%f\n", compute_expr($2)); }
 			| expr '\n'
 			| { /* empty */ } ;
 
-define		: ID '=' num_expr { set_var($1, compute_expr($3)); } ; 
+define		: ID '=' cond { set_var($1, compute_expr($3)); } ; 
 
-define_func	: DEF ID '(' ID ',' ID ')' num_expr { define_func_2($2, $8, $4, $6); } // two arguments
-			| DEF ID '(' ID ')' num_expr { define_func_1($2, $6, $4); } // one argument
-			| DEF ID '(' ')' num_expr { define_func_0($2, $5); } // no arguments
+define_func	: DEF ID '(' ID ',' ID ')' cond { define_func_2($2, $8, $4, $6); } // two arguments
+			| DEF ID '(' ID ')' cond { define_func_1($2, $6, $4); } // one argument
+			| DEF ID '(' ')' cond { define_func_0($2, $5); } // no arguments
 			; 
+
+cond		: num_expr '?' cond ':' cond { $$ = (struct expr*)malloc(sizeof(struct expr));
+				$$->type=cond;
+				printf("t: %f\n", compute_expr($3));
+				printf("f: %f\n", compute_expr($5));
+				$$->cond.c_expr = $1;
+				$$->cond.t_expr = $3;
+				$$->cond.f_expr = $5; 
+			}
+		| num_expr { $$ = $1; } ;
 
 num_expr	: NUM { $$=(struct expr*)malloc(sizeof(struct expr));
 		        	$$->type=cons;
@@ -88,12 +97,6 @@ num_expr	: NUM { $$=(struct expr*)malloc(sizeof(struct expr));
 			        $$->type=var_ident;
 					$$->index=$1;
 				}
-			| num_expr '?' num_expr ':' num_expr %prec COND { $$ = (struct expr*)malloc(sizeof(struct expr));
-					$$->type=cond;
-					$$->cond.c_expr = $1;
-					$$->cond.t_expr = $3;
-					$$->cond.f_expr = $5;
-				 }
 			| ID '(' num_expr ',' num_expr ')' {
 					$$ = (struct expr*)malloc(sizeof(struct expr));
 					$$->type=fptr;
@@ -170,10 +173,11 @@ double compute_expr(struct expr* expr) {
 	double a = 0, b = 0;	
 	switch (expr->type) {
 		case cond:
+			printf("Calculating conditional");
 			if (compute_expr(expr->cond.c_expr))
 				return compute_expr(expr->cond.t_expr);
 			else
-				return compute_expr(expr->cont.f_expr);
+				return compute_expr(expr->cond.f_expr);
 		case oper: 
 			if (expr->op.arg1 != NULL) 
 				a = compute_expr(expr->op.arg1);
