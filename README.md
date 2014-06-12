@@ -1,7 +1,7 @@
 flex_bison_calculator
 =====================
 
-A calculator supporting variables, conditionals, loops and functions written in Flex and Bison.
+A calculator supporting variables, conditionals, loops and functions written in C using Flex and Bison libraries. Project created for the Automata and Grammars course - PJIIT Summer 2014
 
 Build it:
 
