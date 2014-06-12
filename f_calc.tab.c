@@ -1625,7 +1625,7 @@ yyreduce:
 
 /* Line 1806 of yacc.c  */
 #line 119 "f_calc.y"
-    { printf("minus"); (yyval.e) = define_operator_expr('-', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
+    { (yyval.e) = define_operator_expr('-', (yyvsp[(1) - (3)].e), (yyvsp[(3) - (3)].e)); }
     break;
 
   case 22:
@@ -2050,7 +2050,6 @@ double compute_func(int funcptr, struct expr *arg1, struct expr *arg2) {
 		variables[func->func.var_1] = a;
 	if (func->func.n_args == 2) 
 		variables[func->func.var_2] = b;
-	printf("@\n");
 	double result = compute_expr(func->func.body);
 	
 	memcpy(variables, temp_vars, sizeof(double)*100);			
