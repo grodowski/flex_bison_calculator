@@ -15,7 +15,6 @@ gcc lex.yy.c f_calc.tab.c -lfl -o f_calc
 Sample: define factorial
 
 ```
-#!bash
 def f(x,y) x < y ? x * f(x + 1, y) : x
 Functions updated.
 some_var = 6
